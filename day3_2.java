@@ -1,9 +1,8 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,15 +11,20 @@ public class day3_2 {
     public static void main(String[] args) throws Exception {
         BufferedReader in = new BufferedReader(new FileReader(new File("input3")));
         String line;
+        int lineNumber = 1;
+
+        System.out.println("\n\n\n");
 
         long total = 0;
-        while((line = in.readLine()) != null) {
+        while ((line = in.readLine()) != null) {
             char[] chars = line.toCharArray();
 
-            Map<Character, List<Integer>> indices = new HashMap<>(); // map of each number to where it appears in the line
+            Map<Character, ArrayList<Integer>> indices = new HashMap<>(); // map of each number to where it appears in
+                                                                          // the
+            // line
             for (int i = 0; i < chars.length; i++) {
                 char digit = chars[i];
-                List<Integer> indexList;
+                ArrayList<Integer> indexList;
 
                 if (indices.containsKey(digit)) {
                     indexList = indices.get(digit);
@@ -33,52 +37,57 @@ public class day3_2 {
             }
 
             char[] joltageString = new char[chars.length];
-            int remainingChars = chars.length;
             int filledAmt = 0;
             int minIndex = 0;
+            int rightMostFreeIndex = chars.length - 1;
 
             outer: for (char i = '9'; i >= '0'; i--) {
                 if (!indices.containsKey(i))
                     continue;
 
-                List<Integer> indexList = indices.get(i);
+                ArrayList<Integer> indexList = indices.get(i); // always in order
+                // Collections.reverse(indexList);
 
-                if (remainingChars <= 12 - filledAmt && minIndex == 0) {
-                    minIndex = findMin(indices.get(i));
-                    System.out.println(minIndex);
-                }
-
-                for (int j = indexList.size() - 1; j >= minIndex; j--) {
-                    int index = indexList.get(j);
+                for (int index : indexList) {
                     if (filledAmt == 12) {
                         break outer;
-                    } else {
-                        joltageString[index] = i;                        
-                        filledAmt++;
                     }
-                    remainingChars--;
+
+                    if (index < minIndex)
+                        continue;
+
+                    if (rightMostFreeIndex - index >= 12 - filledAmt) {
+                        minIndex = index;
+                    } else {
+                        while (rightMostFreeIndex >= index) {
+                            joltageString[rightMostFreeIndex] = chars[rightMostFreeIndex];
+                            rightMostFreeIndex--;
+                            filledAmt++;
+                            if (filledAmt == 12)
+                                break outer;
+                        }
+                        filledAmt--; // account for adding 1 extra when rmfi = index
+                    }
+
+                    joltageString[index] = i;
+
+                    while (joltageString[rightMostFreeIndex] != '\u0000') {
+                        rightMostFreeIndex--;
+                    }
+
+                    filledAmt++;
                 }
             }
 
-            String joltage = new String(joltageString).replaceAll("\\D","");
+            String joltage = new String(joltageString).replaceAll("\\D", "");
 
+            System.out.println(lineNumber);
             System.out.println(joltage + "\n\n");
 
             total += Long.parseLong(joltage);
+            lineNumber++;
         }
 
         System.out.println(total);
-    }
-
-    private static int findMin(List<Integer> list) {
-        if (list == null)
-            return 0;
-
-        int min = list.get(0);
-        for (int i : list) {
-            if (i < min)
-                min = i;
-        }
-        return min;
     }
 }
