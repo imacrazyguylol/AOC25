@@ -10,9 +10,8 @@ class day1_2 {
         int pointer = 50;
         String line;
         while ((line = read.readLine()) != null) {
-            boolean neg = line.contains("L");
+            int sign = (line.contains("L") ? -1 : 1);
             int amt = Integer.parseInt(line.substring(1));
-            int sign = (neg ? -1 : 1);
             System.out.println(pointer + " " + sign * amt);
             while (amt > 99) {
                 amt -= 100;
