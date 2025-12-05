@@ -25,7 +25,7 @@ def part1():
     print(count)
             
 def part2():
-    ranges:list[list[str]] = [] # unparsed
+    ranges:list[tuple[int, int]] = [] # unparsed
     count = 0
     for line in f:
         line = line.strip()
@@ -35,45 +35,41 @@ def part2():
         minID, maxID = line.split('-')
         minID = int(minID) - 1 # exclusive
         maxID = int(maxID)
+        
+        overlapMin, overlapMax = checkOverlap(ranges, minID, maxID)
 
-        maxVal = maxID # the amount to subtract from maxID - minID is maxVal - minID
-        minVal = minID
-        for minR, maxR in ranges:
-            minR = int(minR)
-            maxR = int(maxR)
-
-            if maxR > minID:
-                if maxR < maxVal: # r is fully contained inside ID
-                    maxVal -= maxR
-                else: # r overlaps only max of ID
-                    maxID = minR
-                
-                
-
-        count += (maxID - minID) - (maxVal - minVal)
-
-        ranges.append( line.split('-') )
+        if overlapMin < overlapMax:
+            count += (maxID - minID) - (overlapMax - overlapMin)
+        else:
+            count += (maxID - minID) - ((maxID - overlapMin) + (overlapMax - minID))
+        
+        ranges.append( (minID, maxID) )
     
     print(count)
 
 # returns amount 
-def checkOverlap(ranges:list[tuple[int, int]], idRange:tuple[int, int]):
-    overlapMax, overlapMin = idRange 
+def checkOverlap(ranges:list[tuple[int, int]], minID, maxID):
+    overlapMax, overlapMin = minID, maxID
     # overlapMin = the min of the overlap on the upper part of the range
     # overlapMax = the max of the overlap on the lower part of the range
-
     for r in ranges:
-        if idRange[0] < r[1] and idRange[1] > r[1]:
+        if (r[0] >= minID and r[1] <= maxID):
+            olMinLower, olMaxLower = checkOverlap(ranges, minID, r[0] + 1)
+            olMinUpper, olMaxUpper = checkOverlap(ranges, r[1] - 1, maxID)
+
+            minID = olMaxLower
+            maxID = olMinUpper
+
+            return olMinLower, olMaxUpper# we already check all the ranges in the recursive, no need to do it again
+
+        if minID < r[1] and maxID > r[1]:
             if overlapMax < r[1]:
                 overlapMax = r[1]
-        if idRange[1] > r[0] and idRange[0] < r[0]:
+        if maxID > r[0] and minID < r[0]:
             if overlapMin > r[0]:
                 overlapMin = r[0]
-    
-    if overlapMin < overlapMax:
-        return (overlapMax - overlapMin)
-    else:
-        return (idRange[1] - overlapMin) + (overlapMax - idRange[0])
+
+    return overlapMin, overlapMax
 
 def main():
     part2()
