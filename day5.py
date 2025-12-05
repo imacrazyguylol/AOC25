@@ -39,28 +39,39 @@ def part2():
         overlapMin, overlapMax = checkOverlap(ranges, minID, maxID)
 
         if overlapMin < overlapMax:
-            count += (maxID - minID) - (overlapMax - overlapMin)
+            amt = (maxID - minID) - (overlapMax - overlapMin)
+            print("= ", amt, sep="")
+            count += amt
         else:
-            count += (maxID - minID) - ((maxID - overlapMin) + (overlapMax - minID))
+            amt = (maxID - minID) - ((maxID - overlapMin) + (overlapMax - minID))
+            print("= ", amt, sep="")
+            count += amt
         
         ranges.append( (minID, maxID) )
     
-    print(count)
+    print("\n", count, sep="")
 
 # returns amount 
 def checkOverlap(ranges:list[tuple[int, int]], minID, maxID):
+    print(minID, "-", maxID, sep="")
+
     overlapMax, overlapMin = minID, maxID
     # overlapMin = the min of the overlap on the upper part of the range
     # overlapMax = the max of the overlap on the lower part of the range
     for r in ranges:
-        if (r[0] >= minID and r[1] <= maxID):
-            olMinLower, olMaxLower = checkOverlap(ranges, minID, r[0] + 1)
-            olMinUpper, olMaxUpper = checkOverlap(ranges, r[1] - 1, maxID)
+        if (r[0] > minID and r[1] < maxID):
+            print("recurse lower: ", r, sep="")
+            olMinLower, olMaxLower = checkOverlap(ranges, minID, r[0])
+            print("recurse upper: ", r, sep="")
+            olMinUpper, olMaxUpper = checkOverlap(ranges, r[1], maxID)
 
             minID = olMaxLower
             maxID = olMinUpper
 
-            return olMinLower, olMaxUpper# we already check all the ranges in the recursive, no need to do it again
+            print("new range: ", minID, "-", maxID, sep="")
+            print("overlapMin: ", olMinLower, "; overlapMax: ", olMaxUpper, sep="")
+
+            return olMinLower, olMaxUpper # we already check all the ranges in the recursive, no need to do it again
 
         if minID < r[1] and maxID > r[1]:
             if overlapMax < r[1]:
@@ -68,6 +79,8 @@ def checkOverlap(ranges:list[tuple[int, int]], minID, maxID):
         if maxID > r[0] and minID < r[0]:
             if overlapMin > r[0]:
                 overlapMin = r[0]
+        if (minID >= r[0] and maxID <= r[1]):
+            return overlapMax, overlapMin
 
     return overlapMin, overlapMax
 
