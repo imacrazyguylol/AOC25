@@ -1,7 +1,7 @@
 import re
 
 
-F = open('input6')
+F = open('example6')
 
 def part1():
     problems:list[list[int]] = []
@@ -65,28 +65,23 @@ def part2():
     grandTotal = 0
     # print(ops)
     print(problems)
-    for c in range(len(problems[0])):
+    for c in range(4):
         isMult = ops[c] == '*' # true -> multiply, false -> add
         total = int(isMult)
 
-        digits = []
-        for r in range(len(problems)):
-            digits.append([int(x) for x in problems[r][c]])
-            
-        # print(digits)
-        for col in range(len(digits[0])):
-            num = 0
-            for row in range(len(digits)):
-                if digits[row][col] != 0:
+        for d in range(len(problems[0][c])):
+            for r in range(len(problems)):
+                num = 0
+                if int(problems[r][c][d]) != 0:
                     num *= 10
 
-                num += digits[row][col]
-            
+                num += int(problems[r][c][d])
+                    
             if isMult:
                 total *= num
             else:
                 total += num
-        
+            
         grandTotal += total
             
 
