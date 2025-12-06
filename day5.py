@@ -33,7 +33,7 @@ def part2():
             break
 
         minID, maxID = line.split('-')
-        minID = int(minID) - 1 # exclusive
+        minID = int(minID)
         maxID = int(maxID)
         
         overlapMin, overlapMax = checkOverlap(ranges, minID, maxID)
@@ -46,7 +46,7 @@ def part2():
             amt = (maxID - minID) - ((maxID - overlapMin) + (overlapMax - minID))
             print("= ", amt, sep="")
             count += amt
-        
+
         ranges.append( (minID, maxID) )
     
     print("\n", count, sep="")
@@ -56,6 +56,7 @@ def checkOverlap(ranges:list[tuple[int, int]], minID, maxID):
     print(minID, "-", maxID, sep="")
 
     overlapMax, overlapMin = minID, maxID
+    # the -1 would only adjust overlapMax in the subtraction if it remains unchanged, otherwise we dont need to
     # overlapMin = the min of the overlap on the upper part of the range
     # overlapMax = the max of the overlap on the lower part of the range
     for r in ranges:
