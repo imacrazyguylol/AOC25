@@ -21,15 +21,12 @@ def part1():
 
 BLANK = "............................................................................................................................................."
 def part2():
-    lineNumber = 0
     beamIndices = [0 for _ in range(141)] # map of column to number of beams currently in it
     for line in F:
         line = line.strip()
-        lineNumber += 1
         if line == BLANK:
             continue
 
-        splits = set() # set of columns where a split happens, allows each beam to check in O(c) time if it needs to be split
         for col in range(len(line)):
             if not beamIndices[col]:
                 beamIndices[col] = 0
