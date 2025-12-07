@@ -32,5 +32,7 @@ public class day3_1 {
         }
 
         System.out.println(total);
+
+        in.close();
     }
 }
