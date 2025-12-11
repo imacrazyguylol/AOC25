@@ -2,50 +2,27 @@ import math
 F = open("input8")
 
 def part1():
-    junctions = []
-    dists = {}
+    closestNeighbors:dict[tuple[int,int,int], tuple[tuple[int,int,int], float]]  = {} # map junctiion to a tuple of (closest neighbor, distance)
     for line in F:
         tokens = line.split(',')
 
         x, y, z = int(tokens[0]), int(tokens[1]), int(tokens[2])
 
-        for i, j, k in junctions:
-            dist = math.sqrt( 
+        for junction in closestNeighbors:
+            i, j, k = junction[0], junction[1], junction[2]
+            dist = math.sqrt(
                 (x - i) ** 2 +
                 (y - j) ** 2 +
                 (z - k) ** 2
             )
 
-            if dist in dists:
-                print("holy shit")
-            dists[dist] = ((x,y,z), (i,j,k))
+            if dist < closestNeighbors[junction][1]:
+                closestNeighbors[junction] = (x,y,z), dist
 
-        junctions.append((x, y, z))
-    
-    sortedDists = sorted(dists.keys())
     circuits:list[set[tuple[int, int, int]]] = []
 
-    for i in range(len(sortedDists)):
-        a, b = dists[sortedDists[i]]
-        connected = False
-        for c in circuits:
-            if a in c:
-                c.add(b)
-                connected = True
-                break
-            elif b in c:
-                c.add(a)
-                connected = True
-                break
+    for junction in closestNeighbors:
         
-        if not connected:
-            s = set()
-            s.add((a, b))
-            circuits.append(s)
-
-    sortedCircuits = sorted(circuits, key=(lambda x : len(x)))
-    print( len(sortedCircuits[0]) * len(sortedCircuits[1]) * len(sortedCircuits[2]))
-    print(circuits)
 
 def main():
     part1()
